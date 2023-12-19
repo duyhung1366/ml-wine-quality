@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_validate
 
-wine_dataset = pd.read_csv('./winequalityN.csv').drop("type", axis=1)
+wine_dataset = pd.read_csv('./winequality_6000.csv').drop("type", axis=1)
 modelRandomForest = RandomForestClassifier(
     random_state = 0,
     min_samples_split = 8,
@@ -26,6 +26,10 @@ specificity_random_fr = None
 accuracy_knn = None
 recall_knn = None
 specificity_knn = None
+
+# accuracy_score 
+score_accuracy_randomFr = None
+score_accuracy_knn = None
 
 X = wine_dataset.drop("quality", axis=1)
 Y = wine_dataset['quality'].apply(lambda y_value: 1 if y_value >= 6 else 0)
@@ -58,7 +62,20 @@ def analyze_wine_dataset(dataset):
     sns.barplot(x="quality", y="citric acid", data=dataset).set(title="Sự tương quan giữa citric acid và chất lượng rượu")
     plt.show()
 
+def accuracy(X_test, Y_test):
+    Y_pred_randomFr = modelRandomForest.predict(X_test.values)
+    Y_pred_knn = knn_model.predict(X_test.values)
+    # Tính độ chính xác
+    accuracy_randomFr = accuracy_score(Y_test.values, Y_pred_randomFr)
+    accuracy_knn = accuracy_score(Y_test.values, Y_pred_knn)
+    global score_accuracy_randomFr
+    global score_accuracy_knn
+    score_accuracy_randomFr = accuracy_randomFr
+    score_accuracy_knn = accuracy_knn
+
 def valueInConfusion(cm):
+    print("ma trận đánh giá mô hình confusion matrix: \n")
+    print(cm)
     TP = cm[1, 1]  # True Positive
     TN = cm[0, 0]  # True Negative
     FP = cm[0, 1]  # False Positive
@@ -70,6 +87,10 @@ def valueInConfusion(cm):
     recall = TP / (TP + FN)
     # Tính toán độ đặc hiệu (Specificity)
     specificity = TN / (TN + FP)
+    # Tính toán độ chính xác dương tính (Precision)
+    # precision = TP / (TP + FP)
+    # Tính toán F1-score
+    # f1_score = 2 * (precision * recall) / (precision + recall)
     return accuracy, recall, specificity
 
 def confusionMatrix(X_test, Y_test):
@@ -100,28 +121,6 @@ def confusionMatrix(X_test, Y_test):
     recall_knn = _recall_knn
     specificity_knn = _specificity_knn
 
-def score_binary_classifier(classifier, X = X, y = Y, cv = cls_cv,
-                            scoring = ['accuracy', 'precision', 'recall', 'f1'],):
-    result = cross_validate(
-        classifier, X, y,
-        scoring = scoring,
-        cv = cv,
-        return_train_score = True,
-        return_estimator = True,
-        error_score = 'raise',
-    )
-    score_df = pd.DataFrame(
-        {
-            a: b
-            for k in scoring
-            for a, b in {
-                f'train_{k}': result[f'train_{k}'],
-                f'test_{k}': result[f'test_{k}'],
-            }.items()
-        }
-    )
-    return {**result, 'score_df': score_df}
-
 def input_datas():
     # Nhập vào một chuỗi từ người dùng
     input_string = input("Nhập vào các số, cách nhau bằng dấu phẩy: ")
@@ -138,6 +137,7 @@ def merchineLearning():
     modelRandomForest.fit(X_train.values, Y_train.values)
     knn_model.fit(X_train.values, Y_train.values)
     confusionMatrix(X_test, Y_test)
+    accuracy(X_test, Y_test)
     # result = score_binary_classifier(modelRandomForest)
     # print(result['score_df'])
     print("learning success!")
@@ -159,25 +159,22 @@ def output():
     else:
         print("bad quality wine")
 
+    print("Accuracy random forest: {:.2f}%".format(accuracy_random_fr*100))
+    print("Recall random forest: {:.2f}%".format(recall_random_fr*100))
+    print("Specificity random forest: {:.2f}%".format(specificity_random_fr*100))
+    print("accuracy dựa vào accuracy_score : {:.2f}%".format(score_accuracy_randomFr*100))
+    print("----------------*********************-----------------")
+
     print("KNN : ")
     knn_prediction = knn_model.predict(input_data_reshaped)
     if(knn_prediction[0] == 1):
         print("Good quality wine")
     else:
         print("bad quality wine")
-
-    print("Accuracy random forest: {:.2f}%".format(accuracy_random_fr*100))
-    print("Recall random forest: {:.2f}%".format(recall_random_fr*100))
-    print("Specificity random forest: {:.2f}%".format(specificity_random_fr*100))
     print("Accuracy random knn: {:.2f}%".format(accuracy_knn*100))
     print("Recall random knn: {:.2f}%".format(recall_knn*100))
     print("Specificity random knn: {:.2f}%".format(specificity_knn*100))
-    # print("Accuracy knn: {:.2f}%".format(test_data_accuracy_percentage_knn))
-
-def input_numbers(input_string):
-    # Tách chuỗi thành danh sách các số
-    numbers = [float(num.strip()) for num in input_string.split(',')]
-    return numbers
+    print("accuracy dựa vào accuracy_score : {:.2f}%".format(score_accuracy_knn*100))
 
 def main_menu():
     while True:
