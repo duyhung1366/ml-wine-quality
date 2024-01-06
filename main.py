@@ -8,9 +8,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import cross_validate
-from sklearn.preprocessing import MinMaxScaler
 import tkinter as tk
 from tkinter import messagebox
 
@@ -20,10 +17,7 @@ modelRandomForest = RandomForestClassifier(
     min_samples_split = 8,
     max_depth = 6,
 )
-# svm_model = SVC()
 knn_model = KNeighborsClassifier()
-cls_cv = StratifiedKFold(shuffle = True, random_state = 0)
-scaler = MinMaxScaler()
 accuracy_random_fr = None
 recall_random_fr = None
 specificity_random_fr = None
@@ -39,13 +33,9 @@ f1_score_knn= None
 score_accuracy_randomFr = None
 score_accuracy_knn = None
 
-# 
-# wine_dataset_scaled = wine_dataset.copy()
-# wine_dataset_scaled.iloc[:, :-1] = scaler.fit_transform(wine_dataset.iloc[:, :-1])
-
 # Tạo biến X và Y
 X = wine_dataset.drop("quality", axis=1)
-Y = wine_dataset['quality'].apply(lambda y_value: 1 if y_value >= 5.5 else 0)
+Y = wine_dataset['quality'].apply(lambda y_value: 1 if y_value >= 6 else 0)
 
 def analyze_wine_dataset(dataset):
     print("Shape of the dataset:")
