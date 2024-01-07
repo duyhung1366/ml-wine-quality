@@ -227,31 +227,6 @@ def output(datas):
     prediction = modelRandomForest.predict(input_data_reshaped)
     knn_prediction = knn_model.predict(input_data_reshaped)
     return prediction, knn_prediction 
-    print("random forest: ")
-    if(prediction[0] == 1):
-        print("Good quality wine")
-    else:
-        print("bad quality wine")
-
-    print("Accuracy random forest: {:.2f}%".format(accuracy_random_fr*100))
-    print("Recall random forest: {:.2f}%".format(recall_random_fr*100))
-    print("Specificity random forest: {:.2f}%".format(specificity_random_fr*100))
-    print("precision random forest: {:.2f}%".format(precision_random_fr*100))
-    print("f1 random forest: {:.2f}%".format(f1_score_random_fr*100))
-    print("accuracy dựa vào accuracy_score: {:.2f}%".format(score_accuracy_randomFr*100))
-    print("----------------*********************-----------------")
-
-    print("KNN: ")
-    if(knn_prediction[0] == 1):
-        print("Good quality wine")
-    else:
-        print("bad quality wine")
-    print("Accuracy knn: {:.2f}%".format(accuracy_knn*100))
-    print("Recall knn: {:.2f}%".format(recall_knn*100))
-    print("Specificity knn: {:.2f}%".format(specificity_knn*100))
-    print("precision knn: {:.2f}%".format(precision_knn*100))
-    print("f1 knn: {:.2f}%".format(f1_score_knn*100))
-    print("accuracy dựa vào accuracy_score: {:.2f}%".format(score_accuracy_knn*100))
 
 def main_menu():
     while True:
