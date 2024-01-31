@@ -36,6 +36,7 @@ score_accuracy_knn = None
 # Tạo biến X và Y
 X = wine_dataset.drop("quality", axis=1)
 Y = wine_dataset['quality'].apply(lambda y_value: 1 if y_value >= 6 else 0)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=3)
 
 def analyze_wine_dataset(dataset):
     print("Shape of the dataset:")
@@ -50,19 +51,28 @@ def analyze_wine_dataset(dataset):
     print("\nStatistical measures of the dataset:")
     print(dataset.describe())
 
-     # Số lượng giá trị cho mỗi chất lượng (quality)
+    # Số lượng giá trị cho mỗi chất lượng (quality)
     sns.set_style("darkgrid")
     sns.catplot(x='quality', data=dataset, kind="count").set(title='Số lượng cho mỗi giá trị của cột quality')
+    plt.subplots_adjust(left=0.08, bottom=0.071, top=0.92)
     plt.show()
 
     # Sự tương quan giữa volatile acidity và chất lượng rượu
     sns.set_style("darkgrid")
     plt.figure(figsize=(8, 6))
     sns.barplot(x="quality", y="volatile acidity", data=dataset).set(title="Sự tương quan giữa volatile acidity và chất lượng rượu")
+    plt.show()
 
     # Sự tương quan giữa citric acid và chất lượng rượu
     plt.figure(figsize=(8, 6))
     sns.barplot(x="quality", y="citric acid", data=dataset).set(title="Sự tương quan giữa citric acid và chất lượng rượu")
+    plt.show()
+
+    # biểu đồ nhiệt mối tương quan giữa các thuộc tính
+    correlation = dataset.corr()
+    plt.figure(figsize=(10,10))
+    sns.heatmap(correlation, cbar=True, square=True, fmt = '.1f', annot = True, annot_kws={'size':8}, cmap = 'Blues').set(title="Biểu đồ tương quan giữa các thuộc tính")
+    plt.subplots_adjust(left=0, bottom=0.202, right=0.784)
     plt.show()
 
 def accuracy(X_test, Y_test):
@@ -77,8 +87,8 @@ def accuracy(X_test, Y_test):
     score_accuracy_knn = accuracy_knn
 
 def valueInConfusion(cm):
-    print("ma trận đánh giá mô hình confusion matrix: \n")
-    print(cm)
+    # print("ma trận đánh giá mô hình confusion matrix: \n")
+    # print(cm)
     TP = cm[1, 1]  # True Positive
     TN = cm[0, 0]  # True Negative
     FP = cm[0, 1]  # False Positive
@@ -106,7 +116,7 @@ def confusionMatrix(X_test, Y_test):
     cm_knn = confusion_matrix(Y_test.values, Y_pred_Knn)
     # In ma trận confusion
     # print("Confusion Matrix:")
-    # print(cm)
+    # print(cm_random_fr)
 
     # Trích xuất các giá trị từ ma trận confusion
     _accuracy_random_fr, _recall_random_fr, _specificity_random_fr, _precision_random_fr, _f1_score_random_fr = valueInConfusion(cm_random_fr)
@@ -142,8 +152,6 @@ def input_datas():
     return numbers
 
 def merchineLearning():
-    # model training
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=3)
     # print(X_train, Y_train)
     modelRandomForest.fit(X_train.values, Y_train.values)
     knn_model.fit(X_train.values, Y_train.values)
@@ -192,20 +200,20 @@ def input_data():
             
             # Hiển thị thông báo với các kết quả
             messagebox.showinfo("Kết quả",f"Random Forest Prediction: {'Good quality wine' if prediction_random_forest[0] == 1 else 'Bad quality wine'}\n"
-                                f"Random Forest Accuracy: {accuracy_random_fr:.2f}%\n"
-                                f"Random Forest Recall: {recall_random_fr:.2f}%\n"
-                                f"Random Forest Specificity: {specificity_random_fr:.2f}%\n"
-                                f"Random Forest Precision: {precision_random_fr:.2f}%\n"
-                                f"Random Forest F1 Score: {f1_score_random_fr:.2f}%\n"
-                                f"Random Forest Accuracy (using accuracy_score): {score_accuracy_randomFr:.2f}%\n"
+                                f"Random Forest Accuracy: {accuracy_random_fr*100:.2f}%\n"
+                                f"Random Forest Recall: {recall_random_fr*100:.2f}%\n"
+                                f"Random Forest Specificity: {specificity_random_fr*100:.2f}%\n"
+                                f"Random Forest Precision: {precision_random_fr*100:.2f}%\n"
+                                f"Random Forest F1 Score: {f1_score_random_fr*100:.2f}%\n"
+                                f"Random Forest Accuracy (dựa vào accuracy_score): {score_accuracy_randomFr*100:.2f}%\n"
                                 "--------------------**********---------------------------\n"
                                 f"KNN Prediction: {'Good quality wine' if prediction_knn[0] == 1 else 'Bad quality wine'}\n"
-                                f"KNN Accuracy: {accuracy_knn:.2f}%\n"
-                                f"KNN Recall: {recall_knn:.2f}%\n"
-                                f"KNN Specificity: {specificity_knn:.2f}%\n"
-                                f"KNN Precision: {precision_knn:.2f}%\n"
-                                f"KNN F1 Score: {f1_score_knn:.2f}%\n"
-                                f"KNN Accuracy (using accuracy_score): {score_accuracy_knn:.2f}%")
+                                f"KNN Accuracy: {accuracy_knn*100:.2f}%\n"
+                                f"KNN Recall: {recall_knn*100:.2f}%\n"
+                                f"KNN Specificity: {specificity_knn*100:.2f}%\n"
+                                f"KNN Precision: {precision_knn*100:.2f}%\n"
+                                f"KNN F1 Score: {f1_score_knn*100:.2f}%\n"
+                                f"KNN Accuracy (dựa vào accuracy_score): {score_accuracy_knn*100:.2f}%")
         except ValueError:
             result_label.config(text="Lỗi: Vui lòng chỉ nhập các giá trị số.")
             
